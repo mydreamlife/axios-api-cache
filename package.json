@@ -1,0 +1,27 @@
+{
+  "name": "axios-api-catch",
+  "version": "1.0.0",
+  "description": "Axios-based API library, incloding API catch,cancel request and refresh token",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mydreamlife/axios-api-catch.git"
+  },
+  "keywords": [
+    "api",
+    "catch",
+    "cancel",
+    "request",
+    "refresh",
+    "token"
+  ],
+  "author": "Lee",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mydreamlife/axios-api-catch/issues"
+  },
+  "homepage": "https://github.com/mydreamlife/axios-api-catch#readme"
+}
