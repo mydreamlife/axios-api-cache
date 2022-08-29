@@ -1,3 +1,3 @@
 module.exports = {
-  AxiosApiCatch: require('./axios-api-catch').AxiosApiCatch
+  ApiCatch: require('./axios-api-catch').ApiCatch
 } 

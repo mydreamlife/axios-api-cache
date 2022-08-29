@@ -12,7 +12,7 @@
 
 import axios from 'axios'
 import qs from 'qs'
-const ApiCatch = require('axios-api-catch')
+const ApiCatch = require('axios-api-catch').ApiCatch
 // 其中第二个参数axiosCreateOptions为  axios.create()中配置
 const axiosCreateOptions = {}
 window.apiCatchInstance = new ApiCatch.ApiCatch(axios,axiosCreateOptions,{
