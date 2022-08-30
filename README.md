@@ -8,10 +8,10 @@
 // window.apiCatchInstance.post(url,params,other={})
 // 2、如果想使用axios原始请求
 // window.apiCatchInstance.$axios 即可，但这样无法使用本缓存，取消请求，和refreshToekn可以正常使用，不建议这样使用
-
+// 3、如果在切换路由时需要取消全部正在请求的接口
+// 在路由守卫中调用 window.apiCatchInstance.clearCancel()方法
 
 import axios from 'axios'
-import qs from 'qs'
 const ApiCatch = require('axios-api-catch').ApiCatch
 // 其中第二个参数axiosCreateOptions为  axios.create()中配置
 const axiosCreateOptions = {}
