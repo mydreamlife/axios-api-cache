@@ -2,8 +2,10 @@
   "name": "axios-api-catch",
   "version": "0.0.0",
   "description": "Axios-based API library, incloding API catch,cancel request and refresh token",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
+    "build": "rollup -c rollup.config.js",
+    "dev": "rollup -c rollup.config.js -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -23,5 +25,16 @@
   "bugs": {
     "url": "https://github.com/mydreamlife/axios-api-catch/issues"
   },
-  "homepage": "https://github.com/mydreamlife/axios-api-catch#readme"
+  "homepage": "https://github.com/mydreamlife/axios-api-catch#readme",
+  "dependencies": {
+    "@babel/core": "^7.18.13",
+    "@babel/plugin-transform-runtime": "^7.18.10",
+    "@babel/preset-env": "^7.18.10",
+    "@rollup/plugin-babel": "^5.3.1",
+    "@rollup/plugin-commonjs": "^22.0.1",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "core-js": "^3.25.0",
+    "rollup": "^2.75.7",
+    "rollup-plugin-terser": "^7.0.2"
+  }
 }

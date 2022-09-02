@@ -1,3 +1,3 @@
-module.exports = {
-  ApiCatch: require('./axios-api-catch').ApiCatch
-} 
+import {ApiCatch} from './src/axios-api-catch'
+
+export default ApiCatch

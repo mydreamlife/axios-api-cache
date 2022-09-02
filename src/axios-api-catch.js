@@ -3,7 +3,7 @@ class ApiCatch {
    * @name cacheMap存放接口缓存集合结构
    * @key 构成：拦截中config 中 url + 参数 data + 参数 params + method 作为key
    */
-  static cacheMap = new Map() // 存放接口缓存集合
+  static cacheMap // 存放接口缓存集合
    /**
     * @name tokenExceedMap存放token过期集合结构
     * @key 构成：拦截中config 中 url + 参数 data + 参数 params + method 作为key
@@ -12,7 +12,7 @@ class ApiCatch {
     *   ...response
     * }
     */
-  static tokenExceedMap = new Map() // token过期，存放的接口请求集合
+  static tokenExceedMap // token过期，存放的接口请求集合
   /**
    * @name cancelMap取消请求的集合结构
    * @key 构成：拦截中config 中 url + 参数 data + 参数 params + method 作为key
@@ -22,7 +22,7 @@ class ApiCatch {
    *   ...config
    * }
    */
-  static cancelMap = new Map() // 存放不同接口取消请求的集合
+  static cancelMap // 存放不同接口取消请求的集合
   static options
   static interceptorsResponseSuccessCallback
   static interceptorsResponseErrorCallback
@@ -47,6 +47,9 @@ class ApiCatch {
       ...defaultOptions,
       ...options
     }
+    ApiCatch.cacheMap = new Map()
+    ApiCatch.tokenExceedMap = new Map()
+    ApiCatch.cancelMap = new Map()
     ApiCatch.options = this.options
     ApiCatch.CancelToken = axios.CancelToken
     ApiCatch.refreshToken = options?.refreshToken
@@ -167,9 +170,9 @@ class ApiCatch {
   static refreshTokenFlow(data){
     if(!ApiCatch.refreshList.length){
       ApiCatch.refreshToken().then(
-        async token => {
+        async tokenStr => {
           ApiCatch.clearMap('cacheMap')
-          await ApiCatch.refreshList.forEach(cb => cb(token))
+          await ApiCatch.refreshList.forEach(cb => cb(tokenStr))
           ApiCatch.refreshList=[]
         },
         () => {
