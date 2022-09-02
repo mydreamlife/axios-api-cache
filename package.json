@@ -26,6 +26,10 @@
   "bugs": {
     "url": "https://github.com/mydreamlife/axios-api-catch/issues"
   },
+  "files": [
+    "dist/",
+    "README.md"
+  ],
   "homepage": "https://github.com/mydreamlife/axios-api-catch#readme",
   "dependencies": {
     "@babel/core": "^7.18.13",
