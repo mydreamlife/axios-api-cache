@@ -1,3 +1,3 @@
-import {ApiCatch} from './src/axios-api-catch'
+import {ApiCache} from './src/axios-api-cache'
 
-export default ApiCatch
+export default ApiCache

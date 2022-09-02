@@ -1,4 +1,4 @@
-export class ApiCatch {
+export class ApiCache {
   /**
    * @name cacheMap存放接口缓存集合结构
    * @key 构成：拦截中config 中 url + 参数 data + 参数 params + method 作为key
@@ -8,7 +8,7 @@ export class ApiCatch {
     * @name tokenExceedMap存放token过期集合结构
     * @key 构成：拦截中config 中 url + 参数 data + 参数 params + method 作为key
     * @key:{
-    *   catchTimeout: 时间戳毫秒级别，超过当前时间超过这个时间，就 delete 这条数据
+    *   cacheTimeout: 时间戳毫秒级别，超过当前时间超过这个时间，就 delete 这条数据
     *   ...response
     * }
     */
@@ -32,8 +32,8 @@ export class ApiCatch {
   static $axios
   constructor(axios,createAxios,options){
     const defaultOptions = {
-      isGetCatch: true, // 全局默认get请求缓存, 如果不需要缓存，请再请求头中添加 isGetCatch: false
-      isPostCatch: false, // 全局默认post请求不缓存，如果需要缓存，请再请求头中添加 isPostCatch: true
+      isGetCache: true, // 全局默认get请求缓存, 如果不需要缓存，请再请求头中添加 isGetCache: false
+      isPostCache: false, // 全局默认post请求不缓存，如果需要缓存，请再请求头中添加 isPostCache: true
       isCancelToken: true, // 全局默认开启取消请求，如果某个接口不许呀，请在请求头中添加 isCancelToken: false
       cancelApiKeyList: [], // 前提是全局开启取消请求或者对单独接口设置isCancelToken：true 由于Map中key定义规则为：url + 参数 data + 参数 params + method 作为key，但有些接口不需要参数来确定唯一key，例如：热搜索，其搜索参数为实时变化，因此只需要url+method作为Map中的唯一key即可
       size: 50, // 默认缓存大小 50条
@@ -41,77 +41,77 @@ export class ApiCatch {
       headerTokenKey: 'Authorization', // 接口响应头需要携带token的字段默认为：Authorization
       tokenCode: [401,302], // token失效后的code状态，默认 401和302
       noRefreshUri: [], // 不需要refreshToken的uri
-      catchTimeout: 60 * 60 * 1000 // 缓存有效时长默认为 1个小时
+      cacheTimeout: 60 * 60 * 1000 // 缓存有效时长默认为 1个小时
     }
     this.options = {
       ...defaultOptions,
       ...options
     }
-    ApiCatch.cacheMap = new Map()
-    ApiCatch.tokenExceedMap = new Map()
-    ApiCatch.cancelMap = new Map()
-    ApiCatch.options = this.options
-    ApiCatch.CancelToken = axios.CancelToken
-    ApiCatch.refreshToken = options?.refreshToken
-    if(options.isRefreshToken&&!ApiCatch.refreshToken){
+    ApiCache.cacheMap = new Map()
+    ApiCache.tokenExceedMap = new Map()
+    ApiCache.cancelMap = new Map()
+    ApiCache.options = this.options
+    ApiCache.CancelToken = axios.CancelToken
+    ApiCache.refreshToken = options?.refreshToken
+    if(options.isRefreshToken&&!ApiCache.refreshToken){
       throw new Error('请重写refreshToken函数逻辑, 需要返回Promise，并且成功回调中需要传入刷新后的token。resolve(token)')
     }
     this.$axios = axios.create(createAxios)
-    ApiCatch.$axios = axios.create(createAxios)
+    ApiCache.$axios = axios.create(createAxios)
   }
   /**
    * @name 公共静态方法相关
    * **/
   static setMap(objName,key,value){
-    return ApiCatch[objName].set(key,value)
+    return ApiCache[objName].set(key,value)
   }
   static deleteMap(objName,key){
-    return ApiCatch[objName].delete(key)
+    return ApiCache[objName].delete(key)
   }
   static getMap(objName,key){
-    return ApiCatch[objName].get(key)
+    return ApiCache[objName].get(key)
   }
   static clearMap(objName){
-    return ApiCatch[objName].clear()
+    return ApiCache[objName].clear()
   }
   static hasMap(objName,key){
-    return ApiCatch[objName].has(key)
+    return ApiCache[objName].has(key)
   }
   static sizeMap(objName){
-    return ApiCatch[objName].size
+    return ApiCache[objName].size
   }
   static createMapKey(config){ // 创建map的唯一key
     return `${config.url}|data=${JSON.stringify(config.data)}&params=${JSON.stringify(config.params)}&method=${config.method}`
   }
   clearCancel(){
     // 取消全部请求
-    const cancelMapKeyList = [...ApiCatch.cancelMap.keys()]
+    const cancelMapKeyList = [...ApiCache.cancelMap.keys()]
     cancelMapKeyList.map(item=>{
-      const cancelMapData = ApiCatch.getMap('cancelMap',item)
+      const cancelMapData = ApiCache.getMap('cancelMap',item)
       cancelMapData.cancelCallback()
-      ApiCatch.deleteMap('cancelMap',item)
+      ApiCache.deleteMap('cancelMap',item)
     })
   }
   /**
    * @name 缓存相关
    * **/
   static setCacheMap(config, response){ // 设置 缓存集合
-    if(ApiCatch.sizeMap('cacheMap')>ApiCatch.options.size){ // 先判断集合是否超过设置的最大值
-      ApiCatch.deleteMap('cacheMap',[...ApiCatch.cacheMap.keys()][0])
+    if(ApiCache.sizeMap('cacheMap')>ApiCache.options.size){ // 先判断集合是否超过设置的最大值
+      ApiCache.deleteMap('cacheMap',[...ApiCache.cacheMap.keys()][0])
     }
-    const { method, isGetCatch } = config
-    if(isGetCatch || method.toLowerCase()==='get' ? ApiCatch.options.isGetCatch : ApiCatch.options.isPostCatch){
-      ApiCatch.setMap('cacheMap', ApiCatch.createMapKey(config), response)
+    const { method, isGetCache } = config
+    if(isGetCache || method.toLowerCase()==='get' ? ApiCache.options.isGetCache : ApiCache.options.isPostCache){
+      ApiCache.setMap('cacheMap', ApiCache.createMapKey(config), response)
     }
   }
   static isCacheApi(config){ // 1.是否有缓存 2.缓存已经超过，过期时间
     // 该请求是否存在缓存
-    const createMapKey =  ApiCatch.createMapKey(config)
-    if(ApiCatch.hasMap('cacheMap', createMapKey)){ // 1
+    const createMapKey =  ApiCache.createMapKey(config)
+    if(ApiCache.hasMap('cacheMap', createMapKey)){ // 1
       // 2
-      const catchApiData = ApiCatch.getMap('cacheMap', createMapKey)
-      if(catchApiData.catchTimeout<=new Date().getTime()){
-        ApiCatch.deleteMap('cacheMap', createMapKey)
+      const cacheApiData = ApiCache.getMap('cacheMap', createMapKey)
+      if(cacheApiData.cacheTimeout<=new Date().getTime()){
+        ApiCache.deleteMap('cacheMap', createMapKey)
         return false
       }else{
         return true
@@ -124,39 +124,39 @@ export class ApiCatch {
    * @name 提前取消请求相关
    * **/
   static setCancelMapApi(config){ // 1.是否存再正在请求接口
-    const createMapKey =  ApiCatch.cancelMapKey(config)
-    ApiCatch.setMap('cancelMap', createMapKey, config)
+    const createMapKey =  ApiCache.cancelMapKey(config)
+    ApiCache.setMap('cancelMap', createMapKey, config)
   }
   static deleteCancelMapApi(config){ // 1.是否存再正在请求接口
-    const createMapKey =  ApiCatch.cancelMapKey(config)
-    ApiCatch.deleteMap('cancelMap', createMapKey)
+    const createMapKey =  ApiCache.cancelMapKey(config)
+    ApiCache.deleteMap('cancelMap', createMapKey)
   }
   static isCancelMapApi(config){ // 1.是否存再正在请求接口
-    const createMapKey =  ApiCatch.cancelMapKey(config)
-    return ApiCatch.hasMap('cancelMap', createMapKey)
+    const createMapKey =  ApiCache.cancelMapKey(config)
+    return ApiCache.hasMap('cancelMap', createMapKey)
   }
   static cancelMapKey (config){
-    if(ApiCatch.options.cancelApiKeyList.includes(config.url)){
+    if(ApiCache.options.cancelApiKeyList.includes(config.url)){
       return `${config.url}|method=${config.method}`
     }else{
-      return ApiCatch.createMapKey(config)
+      return ApiCache.createMapKey(config)
     }
   }
   static cancelMapFlow(config){
     // 开启取消请求条件
     // options.isCancelToken true 
-    if(config?.isCancelToken || ApiCatch.options.isCancelToken){
-      if(ApiCatch.isCancelMapApi(config)){
+    if(config?.isCancelToken || ApiCache.options.isCancelToken){
+      if(ApiCache.isCancelMapApi(config)){
         // 该接口有正在请求的 cancelMap
-        const cancelMapData = ApiCatch.getMap('cancelMap', ApiCatch.cancelMapKey(config))
+        const cancelMapData = ApiCache.getMap('cancelMap', ApiCache.cancelMapKey(config))
         cancelMapData.cancelCallback()
-        ApiCatch.deleteCancelMapApi(config)
+        ApiCache.deleteCancelMapApi(config)
       }
       // 创建cancelMap提前取消请求集合
       config.apiStatus = 0
-      config.cancelToken = new ApiCatch.CancelToken((cancelCallback) => {
+      config.cancelToken = new ApiCache.CancelToken((cancelCallback) => {
         config.cancelCallback = cancelCallback
-        ApiCatch.setCancelMapApi(config)
+        ApiCache.setCancelMapApi(config)
       })
     }
   }
@@ -165,26 +165,26 @@ export class ApiCatch {
    * **/
   static ifRefreshToken(data){
     const url = data.config.url
-    return ApiCatch.options.isRefreshToken&&ApiCatch.options.tokenCode.includes(data?.response?.status || data?.status || data?.data?.status)&&!ApiCatch.options.noRefreshUri.includes(url)
+    return ApiCache.options.isRefreshToken&&ApiCache.options.tokenCode.includes(data?.response?.status || data?.status || data?.data?.status)&&!ApiCache.options.noRefreshUri.includes(url)
   }
   static refreshTokenFlow(data){
-    if(!ApiCatch.refreshList.length){
-      ApiCatch.refreshToken().then(
+    if(!ApiCache.refreshList.length){
+      ApiCache.refreshToken().then(
         async tokenStr => {
-          ApiCatch.clearMap('cacheMap')
-          await ApiCatch.refreshList.forEach(cb => cb(tokenStr))
-          ApiCatch.refreshList=[]
+          ApiCache.clearMap('cacheMap')
+          await ApiCache.refreshList.forEach(cb => cb(tokenStr))
+          ApiCache.refreshList=[]
         },
         () => {
-          ApiCatch.clearMap('cacheMap')
-          ApiCatch.refreshList=[]
+          ApiCache.clearMap('cacheMap')
+          ApiCache.refreshList=[]
         }
       )
     }
     return new Promise((resolve)=>{
-      ApiCatch.refreshList.push((token)=>{
-        data.config.headers[ApiCatch.options.headerTokenKey] = token
-        resolve(ApiCatch.$axios(data.config))
+      ApiCache.refreshList.push((token)=>{
+        data.config.headers[ApiCache.options.headerTokenKey] = token
+        resolve(ApiCache.$axios(data.config))
       })
     })
   }
@@ -197,7 +197,7 @@ export class ApiCatch {
   interceptorsRequest(successCallback,errCallback){ // 请求拦截
     return this.$axios.interceptors.request.use(
       config => {
-        ApiCatch.cancelMapFlow(config)
+        ApiCache.cancelMapFlow(config)
         if(successCallback){
           return successCallback(config)
         }
@@ -214,32 +214,32 @@ export class ApiCatch {
   interceptorsResponse(successCallback,errCallback){ // 响应拦截
     return this.$axios.interceptors.response.use(
       response => {
-        if(!ApiCatch.isCacheApi(response.config)){
+        if(!ApiCache.isCacheApi(response.config)){
           // 没有缓存或缓存过期
           // 设置该请求缓存过期时间
-          response.catchTimeout = new Date().getTime() + (response.config?.catchTimeout ? response.config?.catchTimeout : ApiCatch.options.catchTimeout)
-          ApiCatch.setCacheMap(response.config, response)
+          response.cacheTimeout = new Date().getTime() + (response.config?.cacheTimeout ? response.config?.cacheTimeout : ApiCache.options.cacheTimeout)
+          ApiCache.setCacheMap(response.config, response)
         }
-        if(ApiCatch.isCancelMapApi(response.config)){ // 删除该请求在cancelMap的数据
-          ApiCatch.deleteCancelMapApi(response.config)
+        if(ApiCache.isCancelMapApi(response.config)){ // 删除该请求在cancelMap的数据
+          ApiCache.deleteCancelMapApi(response.config)
         }
         // token刷新
-        if(ApiCatch.ifRefreshToken(response)){
-          return ApiCatch.refreshTokenFlow(response)
+        if(ApiCache.ifRefreshToken(response)){
+          return ApiCache.refreshTokenFlow(response)
         }
         if(successCallback){
-          ApiCatch.interceptorsResponseSuccessCallback = successCallback
+          ApiCache.interceptorsResponseSuccessCallback = successCallback
           return successCallback(response)
         }
         return Promise.resolve(data)
       },
       error => {
         // token刷新
-        if(ApiCatch.ifRefreshToken(error)){
-          return ApiCatch.refreshTokenFlow(error)
+        if(ApiCache.ifRefreshToken(error)){
+          return ApiCache.refreshTokenFlow(error)
         }
         if(errCallback) {
-          ApiCatch.interceptorsResponseErrorCallback = errCallback
+          ApiCache.interceptorsResponseErrorCallback = errCallback
           return errCallback(error)
         }
         return Promise.reject(error)
@@ -255,21 +255,21 @@ export class ApiCatch {
       method: 'get'
     }
     return new Promise((resolve, reject) => {
-      if(ApiCatch.isCacheApi(config)){
+      if(ApiCache.isCacheApi(config)){
         // 有缓存
-        const catchApiData = ApiCatch.getMap('cacheMap', ApiCatch.createMapKey(config))
-        if(catchApiData.status === 200){
-          if(ApiCatch.interceptorsResponseSuccessCallback){
-            resolve(ApiCatch.interceptorsResponseSuccessCallback(catchApiData))
+        const cacheApiData = ApiCache.getMap('cacheMap', ApiCache.createMapKey(config))
+        if(cacheApiData.status === 200){
+          if(ApiCache.interceptorsResponseSuccessCallback){
+            resolve(ApiCache.interceptorsResponseSuccessCallback(cacheApiData))
             return
           }
-          resolve(catchApiData)
+          resolve(cacheApiData)
         }else{
-          if(ApiCatch.interceptorsResponseErrorCallback){
-            resolve(ApiCatch.interceptorsResponseErrorCallback(catchApiData))
+          if(ApiCache.interceptorsResponseErrorCallback){
+            resolve(ApiCache.interceptorsResponseErrorCallback(cacheApiData))
             return
           }
-          reject(catchApiData)
+          reject(cacheApiData)
         }
       }else{
         // 无缓存
@@ -295,21 +295,21 @@ export class ApiCatch {
       method: 'post'
     }
     return new Promise((resolve, reject) => {
-      if(ApiCatch.isCacheApi(config)){
+      if(ApiCache.isCacheApi(config)){
         // 有缓存
-        const catchApiData = ApiCatch.getMap('cacheMap', ApiCatch.createMapKey(config))
-        if(catchApiData.status === 200){
-          if(ApiCatch.interceptorsResponseSuccessCallback){
-            resolve(ApiCatch.interceptorsResponseSuccessCallback(catchApiData))
+        const cacheApiData = ApiCache.getMap('cacheMap', ApiCache.createMapKey(config))
+        if(cacheApiData.status === 200){
+          if(ApiCache.interceptorsResponseSuccessCallback){
+            resolve(ApiCache.interceptorsResponseSuccessCallback(cacheApiData))
             return
           }
-          resolve(catchApiData)
+          resolve(cacheApiData)
         }else{
-          if(ApiCatch.interceptorsResponseErrorCallback){
-            resolve(ApiCatch.interceptorsResponseErrorCallback(catchApiData))
+          if(ApiCache.interceptorsResponseErrorCallback){
+            resolve(ApiCache.interceptorsResponseErrorCallback(cacheApiData))
             return
           }
-          reject(catchApiData)
+          reject(cacheApiData)
         }
       }else{
         // 无缓存

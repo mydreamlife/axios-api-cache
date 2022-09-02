@@ -1,2 +1,2 @@
-let AxiosApiCatch = require('./index')
-console.log(AxiosApiCatch)
+let AxiosApiCache = require('./index')
+console.log(AxiosApiCache)

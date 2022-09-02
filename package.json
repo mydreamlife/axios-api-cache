@@ -1,7 +1,7 @@
 {
-  "name": "axios-api-catch",
-  "version": "0.0.2",
-  "description": "Axios-based API library, incloding API catch,cancel request and refresh token",
+  "name": "axios-api-cache",
+  "version": "0.0.0",
+  "description": "Axios-based API library, incloding API cache,cancel request and refresh token",
   "main": "dist/index.js",
   "scripts": {
     "build": "rollup -c rollup.config.js",
@@ -11,11 +11,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mydreamlife/axios-api-catch.git"
+    "url": "git+https://github.com/mydreamlife/axios-api-cache.git"
   },
   "keywords": [
     "api",
-    "catch",
+    "cache",
     "cancel",
     "request",
     "refresh",
@@ -24,13 +24,13 @@
   "author": "Lee",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mydreamlife/axios-api-catch/issues"
+    "url": "https://github.com/mydreamlife/axios-api-cache/issues"
   },
   "files": [
     "dist/",
     "README.md"
   ],
-  "homepage": "https://github.com/mydreamlife/axios-api-catch#readme",
+  "homepage": "https://github.com/mydreamlife/axios-api-cache#readme",
   "dependencies": {
     "@babel/core": "^7.18.13",
     "@babel/plugin-transform-runtime": "^7.18.10",
