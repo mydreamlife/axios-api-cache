@@ -1,4 +1,4 @@
-class ApiCatch {
+export class ApiCatch {
   /**
    * @name cacheMap存放接口缓存集合结构
    * @key 构成：拦截中config 中 url + 参数 data + 参数 params + method 作为key
@@ -322,8 +322,4 @@ class ApiCatch {
       }
     })
   }
-}
-
-module.exports = {
-  ApiCatch
 }

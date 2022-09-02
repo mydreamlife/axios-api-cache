@@ -1,6 +1,6 @@
 {
   "name": "axios-api-catch",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Axios-based API library, incloding API catch,cancel request and refresh token",
   "main": "dist/index.js",
   "scripts": {
