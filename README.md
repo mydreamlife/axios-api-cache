@@ -12,7 +12,7 @@
 // 在路由守卫中调用 window.apiCatchInstance.clearCancel()方法
 
 import axios from 'axios'
-const ApiCatch = require('axios-api-catch').ApiCatch
+const ApiCatch = require('axios-api-catch')
 // 其中第二个参数axiosCreateOptions为  axios.create()中配置
 const axiosCreateOptions = {}
 window.apiCatchInstance = new ApiCatch.ApiCatch(axios,axiosCreateOptions,{
