@@ -1,6 +1,6 @@
 {
   "name": "axios-api-cache",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Axios-based API library, incloding API cache,cancel request and refresh token",
   "main": "dist/index.js",
   "scripts": {

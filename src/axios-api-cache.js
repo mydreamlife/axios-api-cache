@@ -100,8 +100,10 @@ export class ApiCache {
       ApiCache.deleteMap('cacheMap',[...ApiCache.cacheMap.keys()][0])
     }
     const { method, isGetCache } = config
-    if(isGetCache || method.toLowerCase()==='get' ? ApiCache.options.isGetCache : ApiCache.options.isPostCache){
-      ApiCache.setMap('cacheMap', ApiCache.createMapKey(config), response)
+    if(typeof isGetCache !== 'boolean' || isGetCache){
+      if(method.toLowerCase()==='get' ? ApiCache.options.isGetCache : ApiCache.options.isPostCache){
+        ApiCache.setMap('cacheMap', ApiCache.createMapKey(config), response)
+      }
     }
   }
   static isCacheApi(config){ // 1.是否有缓存 2.缓存已经超过，过期时间
