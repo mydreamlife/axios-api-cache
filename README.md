@@ -16,7 +16,7 @@ const Apicache = require('axios-api-cache')
 // 其中第二个参数axiosCreateOptions为  axios.create()中配置
 const axiosCreateOptions = {}
 window.apicacheInstance = new Apicache.Apicache(axios,axiosCreateOptions,{
-  isGetcache: true, // 全局默认get请求不缓存, 如果不需要缓存，请再请求头中添加 isGetcache: false
+  isGetcache: true, // 全局默认get请求缓存, 如果不需要缓存，请再请求头中添加 isGetcache: false
   isPostcache: false, // 全局默认post请求不缓存，如果需要缓存，请再请求头中添加 isPostcache: true
   isCancelToken: true, // 全局默认开启取消请求，如果某个接口不许呀，请在请求头中添加 isCancelToken: false
   cancelApiKeyList: [], // 前提是全局开启取消请求或者对单独接口设置isCancelToken：true 由于Map中key定义规则为：url + 参数 data + 参数 params + method 作为key，但有些接口不需要参数来确定唯一key，例如：热搜索，其搜索参数为实时变化，因此只需要url+method作为Map中的唯一key即可

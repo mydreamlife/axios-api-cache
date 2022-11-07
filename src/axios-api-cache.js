@@ -233,7 +233,7 @@ export class ApiCache {
           ApiCache.interceptorsResponseSuccessCallback = successCallback
           return successCallback(response)
         }
-        return Promise.resolve(data)
+        return Promise.resolve(response)
       },
       error => {
         // token刷新
